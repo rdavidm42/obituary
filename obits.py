@@ -16,12 +16,13 @@ def search(search_term,text):
     
 def get_obits(text):
     url = 'https://www.readingeagle.com/?s='+text+'&post_type=obituary&orderby=relevance'
-    # opts = FirefoxOptions()
-    # opts.add_argument("--headless")
-    driver = webdriver.Firefox()#options=opts)   
+    options = ChromeOptions()
+    options.add_argument("--headless=new")
+    driver = webdriver.Chrome(options=options)
     
     driver.get(url)
     file = driver.page_source
+    driver.quit()
     soup = BeautifulSoup(file, 'lxml')
     
     results = [x.find_previous() for x in soup.find_all(class_='obit-search-result-person-name')]
