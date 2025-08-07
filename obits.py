@@ -3,7 +3,7 @@ from selenium import webdriver
 import streamlit as st
 import pandas as pd
 import re
-from selenium.webdriver import FirefoxOptions
+from selenium.webdriver import ChromeOptions
 
 st.set_page_config(layout="wide")
 
