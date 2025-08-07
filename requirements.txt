@@ -3,4 +3,3 @@ lxml
 openpyxl
 selenium
 chromium
-chromium-driver
