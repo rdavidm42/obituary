@@ -22,7 +22,6 @@ def get_obits(text):
     
     driver.get(url)
     file = driver.page_source
-    driver.quit()
     soup = BeautifulSoup(file, 'lxml')
     
     results = [x.find_previous() for x in soup.find_all(class_='obit-search-result-person-name')]
