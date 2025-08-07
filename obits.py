@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 import streamlit as st
 import pandas as pd
-
+import re
 st.set_page_config(layout="wide")
 
 def first_and_last(text):
@@ -32,7 +32,7 @@ def get_list_of_obits(body):
     my_bar = st.progress(0, text='Searching...')
     for text in body:
         percent = i/len(body)
-        my_bar.progress(percent, text=str(percent*100)+'% of Search Completed')
+        my_bar.progress(percent, text='Searching entry ' + str(i+1) + ' of ' + str(len(body)))
         i+=1
         obits = get_obits(text)
         if len(obits) == 0:
@@ -50,15 +50,23 @@ def clean_text(input):
     for i in range(len(text)):
         if text[i].find('&')>-1:
             ampersand_text = text[i].split()
-            ampersand_text.remove('&')
+            if ampersand_text[-2] == 'Van':
+                last_name = ampersand_text[-2] + ' ' + ampersand_text[-1]
+                ampersand_text.remove(ampersand_text[-2])
+                ampersand_text.remove(ampersand_text[-1])
+            else:
+                last_name = ampersand_text[-1]
+                ampersand_text.remove(last_name)
+            both_names = ' '.join(ampersand_text)
+            without_ampersand = re.split(' & ',both_names)
             try:
-                name_1 = ampersand_text[0] +' ' +ampersand_text[2]
-                name_2 = ampersand_text[1] +' ' +ampersand_text[2]
+                name_1 = without_ampersand[0] + ' ' + last_name
+                name_2 = without_ampersand[1] + ' ' + last_name
                 text.remove(text[i])
                 text.append(name_1)
                 text.append(name_2)
             except:
-                text[i].replace('&','')
+                text[i] = ' '.join(text[i].replace('&','').split())
     return text
 
 def main():
@@ -82,12 +90,20 @@ def main():
         st.session_state.names,st.session_state.links = get_list_of_obits(search)
         # st.session_state.have_searched = False
     if len(st.session_state.names)>0:
-        st.write('The following people have appeared in the search:')
+        st.write(f'{len(st.session_state.names)} people have appeared in the search:')
         for x in st.session_state.names:
             print(st.write(x))
         box = st.selectbox('Select Person to Get Additional Info:',st.session_state.names)
         if box:
-            st.write(st.session_state.links[box])
+            for entries in st.session_state.links[box]:
+                st.write(entries)
+        search_results = pd.DataFrame(dict([(key, pd.Series(value)) for key, value in st.session_state.links.items()])).T
+        download_button = st.download_button(
+            label="Download Names",
+            data=search_results.to_csv(),
+            file_name= "results.csv",
+            mime="text/csv",
+        )
 
 if __name__ == "__main__":
     main()
