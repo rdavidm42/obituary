@@ -2,3 +2,5 @@ bs4
 lxml
 openpyxl
 selenium
+chromium
+chromium-driver
