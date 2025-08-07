@@ -16,9 +16,9 @@ def search(search_term,text):
     
 def get_obits(text):
     url = 'https://www.readingeagle.com/?s='+text+'&post_type=obituary&orderby=relevance'
-    opts = FirefoxOptions()
-    opts.add_argument("--headless")
-    driver = webdriver.Firefox(options=opts)   
+    # opts = FirefoxOptions()
+    # opts.add_argument("--headless")
+    driver = webdriver.Firefox()#options=opts)   
     
     driver.get(url)
     file = driver.page_source
