@@ -3,6 +3,8 @@ from selenium import webdriver
 import streamlit as st
 import pandas as pd
 import re
+from selenium.webdriver import FirefoxOptions
+
 st.set_page_config(layout="wide")
 
 def first_and_last(text):
@@ -14,9 +16,13 @@ def search(search_term,text):
     
 def get_obits(text):
     url = 'https://www.readingeagle.com/?s='+text+'&post_type=obituary&orderby=relevance'
-    driver = webdriver.Safari()
+    opts = FirefoxOptions()
+    opts.add_argument("--headless")
+    driver = webdriver.Firefox(options=opts)   
+    
     driver.get(url)
     file = driver.page_source
+    driver.quit()
     soup = BeautifulSoup(file, 'lxml')
     
     results = [x.find_previous() for x in soup.find_all(class_='obit-search-result-person-name')]
